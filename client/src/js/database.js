@@ -24,13 +24,25 @@ export const putDb = async (content) => {
 
 // TODO: Add logic for a method that gets all the content from the database
 export const getDb = async () => {
-  const db = await initdb();
-  const tx = db.transaction('jate', 'readonly');
-  const store =  tx.objectStore('jate');
-  const content = await store.getAll();
-  await tx.done;
-  console.log('Content loaded:', content);
-  return content;
-}
+  try {
+    const db = await initdb();
+    const tx = db.transaction('jate', 'readonly');
+    const store = tx.objectStore('jate');
+    const content = await store.getAll();
+    await tx.done;
+    console.log('Content loaded:', content);
+
+    if (content && content.length > 0) {
+      // Assuming content is an array of strings
+      const mergedContent = content.join('\n'); // Merge array elements into a single string
+      return mergedContent;
+    } else {
+      return ''; // Return an empty string if there is no content in the database
+    }
+  } catch (error) {
+    console.error('Error loading content:', error);
+    throw error;
+  }
+};
 
 initdb();
